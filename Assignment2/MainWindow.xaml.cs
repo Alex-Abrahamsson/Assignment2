@@ -41,6 +41,7 @@ namespace Assignment2
             Width = 800;
             Height = 400;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            
 
             // Scrolling
             var root = new ScrollViewer();
