@@ -28,6 +28,7 @@ namespace Assignment2
         private Button loadArticlesButton;
         private StackPanel articlePanel;
 
+
         public MainWindow()
         {
             InitializeComponent();
@@ -38,7 +39,7 @@ namespace Assignment2
 
         private void Start()
         {
-            //================= The Ui =========================
+            //================= Premade Ui =========================
             #region
             // Window options
             Title = "Feed Reader";
@@ -103,6 +104,8 @@ namespace Assignment2
                 Padding = spacing,
                 IsEditable = false
             };
+            selectFeedComboBox.Items.Add("-- All feeds --");
+            selectFeedComboBox.SelectedIndex = 0;
             grid.Children.Add(selectFeedComboBox);
             Grid.SetRow(selectFeedComboBox, 1);
             Grid.SetColumn(selectFeedComboBox, 1);
@@ -157,14 +160,38 @@ namespace Assignment2
             }
         }
 
-        private void LoadArticlesButton_Click(object sender, RoutedEventArgs e)
+        private async void LoadArticlesButton_Click(object sender, RoutedEventArgs e)
         {
+            loadArticlesButton.IsEnabled = false;
             MessageBox.Show("Load Btn");
+
+
+
+            await Task.Delay(1000);
+            loadArticlesButton.IsEnabled = true;
         }
 
-        private void AddFeedButton_Click(object sender, RoutedEventArgs e)
+        private async void AddFeedButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Add Btn");
+            /*Test Rss Feeds
+             * https://feeds.fireside.fm/bibleinayear/rss
+             * https://feeds.simplecast.com/54nAGcIl
+             * https://www.cinemablend.com/rss/topic/news/movies
+             * https://www.comingsoon.net/feed
+             * https://screencrush.com/feed/ */
+
+            addFeedButton.IsEnabled = false;
+            XDocument doc = await LoadDocumentAsync(addFeedTextBox.Text);
+            string title = doc.Descendants("title").First().Value;
+            selectFeedComboBox.Items.Add(title);
+            await Task.Delay(1000);
+            addFeedButton.IsEnabled = true;
+
+            //string[] titels = new string[5];
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    titels[i] = feed.Descendants("item").Descendants("title").Skip(i).First().Value;
+            //}
         }
 
         private async Task<XDocument> LoadDocumentAsync(string url)
