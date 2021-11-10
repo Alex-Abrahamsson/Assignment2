@@ -34,8 +34,12 @@ namespace Assignment2
             Start();
         }
 
+
+
         private void Start()
         {
+            //================= The Ui =========================
+            #region
             // Window options
             Title = "Feed Reader";
             Width = 800;
@@ -58,6 +62,7 @@ namespace Assignment2
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
 
             var addFeedLabel = new Label
             {
@@ -82,6 +87,7 @@ namespace Assignment2
             };
             grid.Children.Add(addFeedButton);
             Grid.SetColumn(addFeedButton, 2);
+            addFeedButton.Click += AddFeedButton_Click;
 
             var selectFeedLabel = new Label
             {
@@ -110,6 +116,7 @@ namespace Assignment2
             grid.Children.Add(loadArticlesButton);
             Grid.SetRow(loadArticlesButton, 1);
             Grid.SetColumn(loadArticlesButton, 2);
+            loadArticlesButton.Click += LoadArticlesButton_Click;
 
             articlePanel = new StackPanel
             {
@@ -119,6 +126,9 @@ namespace Assignment2
             grid.Children.Add(articlePanel);
             Grid.SetRow(articlePanel, 2);
             Grid.SetColumnSpan(articlePanel, 3);
+            #endregion
+            //==================================================
+
 
             // These are just placeholders.
             // Replace them with your own code that shows actual articles.
@@ -145,6 +155,16 @@ namespace Assignment2
                 };
                 articlePlaceholder.Children.Add(articleWebsite);
             }
+        }
+
+        private void LoadArticlesButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Load Btn");
+        }
+
+        private void AddFeedButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Add Btn");
         }
 
         private async Task<XDocument> LoadDocumentAsync(string url)
