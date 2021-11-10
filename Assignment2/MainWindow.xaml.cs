@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -28,6 +29,7 @@ namespace Assignment2
         private Button loadArticlesButton;
         private StackPanel articlePanel;
 
+        private List<XDocument> sites = new List<XDocument>();
 
         public MainWindow()
         {
@@ -132,50 +134,78 @@ namespace Assignment2
             #endregion
             //==================================================
 
-
-            // These are just placeholders.
-            // Replace them with your own code that shows actual articles.
-            for (int i = 0; i < 3; i++)
-            {
-                var articlePlaceholder = new StackPanel
-                {
-                    Orientation = Orientation.Vertical,
-                    Margin = spacing
-                };
-                articlePanel.Children.Add(articlePlaceholder);
-
-                var articleTitle = new TextBlock
-                {
-                    Text = "2021-01-02 12:34 - Placeholder for an actual article title #" + (i + 1),
-                    FontWeight = FontWeights.Bold,
-                    TextTrimming = TextTrimming.CharacterEllipsis
-                };
-                articlePlaceholder.Children.Add(articleTitle);
-
-                var articleWebsite = new TextBlock
-                {
-                    Text = "Website name #" + (i + 1)
-                };
-                articlePlaceholder.Children.Add(articleWebsite);
-            }
         }
+
 
         private async void LoadArticlesButton_Click(object sender, RoutedEventArgs e)
         {
             loadArticlesButton.IsEnabled = false;
-            MessageBox.Show("Load Btn");
-
-
+            articlePanel.Children.Clear();
+            if (selectFeedComboBox.SelectedIndex == 0)
+            {
+                ShowFiveFeedsFromAllSites();
+            }
+            else
+            {
+                int index = --selectFeedComboBox.SelectedIndex;
+                var site = sites.ElementAt(index);
+                for (int i = 0; i < 5; i++)
+                {
+                    GetFeed(site,i);
+                }
+            }
 
             await Task.Delay(1000);
             loadArticlesButton.IsEnabled = true;
         }
 
+
+
+        private void ShowFiveFeedsFromAllSites()
+        {
+            foreach (XDocument item in sites)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    GetFeed(item, i);
+                }
+            }
+        }
+
+
+
+        private void GetFeed(XDocument item, int i)
+        {
+            string title = item.Descendants("item").Descendants("title").Skip(i).First().Value;
+            var pubDate = item.Descendants("item").Descendants("pubDate").Skip(i).First().Value;
+            var newb = DateTime.ParseExact(pubDate.Substring(0, 25), "ddd, dd MMM yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+            var artivleHolder = new StackPanel
+            {
+                Orientation = Orientation.Vertical,
+                Margin = spacing
+            };
+            articlePanel.Children.Add(artivleHolder);
+
+            var articleTitle = new TextBlock
+            {
+                Text = $"{newb} - {title} # {i + 1} ",
+                FontWeight = FontWeights.Bold,
+                TextTrimming = TextTrimming.CharacterEllipsis
+            };
+            artivleHolder.Children.Add(articleTitle);
+            var articleWebsite = new TextBlock
+            {
+                Text = $"{item.Descendants("title").First().Value}"
+            };
+            artivleHolder.Children.Add(articleWebsite);
+        }
+
+
+
         private async void AddFeedButton_Click(object sender, RoutedEventArgs e)
         {
             /*Test Rss Feeds
              * https://feeds.fireside.fm/bibleinayear/rss
-             * https://feeds.simplecast.com/54nAGcIl
              * https://www.cinemablend.com/rss/topic/news/movies
              * https://www.comingsoon.net/feed
              * https://screencrush.com/feed/ */
@@ -184,15 +214,14 @@ namespace Assignment2
             XDocument doc = await LoadDocumentAsync(addFeedTextBox.Text);
             string title = doc.Descendants("title").First().Value;
             selectFeedComboBox.Items.Add(title);
+            sites.Add(doc);
+            addFeedTextBox.Clear();
             await Task.Delay(1000);
             addFeedButton.IsEnabled = true;
-
-            //string[] titels = new string[5];
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    titels[i] = feed.Descendants("item").Descendants("title").Skip(i).First().Value;
-            //}
         }
+
+
+
 
         private async Task<XDocument> LoadDocumentAsync(string url)
         {
