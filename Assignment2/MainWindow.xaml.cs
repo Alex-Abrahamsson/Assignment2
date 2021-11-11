@@ -152,14 +152,16 @@ namespace Assignment2
                 for (int i = 0; i < 5; i++)
                 {
                     GetFeed(site,i);
+                    
                 }
             }
 
             await Task.Delay(1000);
             loadArticlesButton.IsEnabled = true;
+            
         }
 
-
+        
 
         private void ShowFiveFeedsFromAllSites()
         {
